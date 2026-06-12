@@ -67,7 +67,7 @@ def decrypt(ciphertext_bits, seed):
 # Demo
 seed = "10110101"
 
-message = "HELLO"
+message = "CRYPTOGRAPHY"
 
 cipher = encrypt(message, seed)
 
