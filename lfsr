@@ -1,0 +1,79 @@
+# LFSR Stream Cipher
+
+def lfsr(seed, length):
+    state = [int(bit) for bit in seed]
+    keystream = []
+
+    for _ in range(length):
+        output = state[-1]
+        keystream.append(output)
+
+        feedback = state[0] ^ state[2]
+
+        state = [feedback] + state[:-1]
+
+    return keystream
+
+
+def text_to_bits(text):
+    bits = []
+
+    for char in text:
+        binary = format(ord(char), '08b')
+
+        for bit in binary:
+            bits.append(int(bit))
+
+    return bits
+
+
+def bits_to_text(bits):
+    text = ""
+
+    for i in range(0, len(bits), 8):
+        byte = bits[i:i+8]
+
+        binary = ''.join(str(bit) for bit in byte)
+
+        text += chr(int(binary, 2))
+
+    return text
+
+
+def encrypt(plaintext, seed):
+    plaintext_bits = text_to_bits(plaintext)
+
+    keystream = lfsr(seed, len(plaintext_bits))
+
+    ciphertext_bits = []
+
+    for p, k in zip(plaintext_bits, keystream):
+        ciphertext_bits.append(p ^ k)
+
+    return ciphertext_bits
+
+
+def decrypt(ciphertext_bits, seed):
+    keystream = lfsr(seed, len(ciphertext_bits))
+
+    plaintext_bits = []
+
+    for c, k in zip(ciphertext_bits, keystream):
+        plaintext_bits.append(c ^ k)
+
+    return bits_to_text(plaintext_bits)
+
+
+# Demo
+seed = "10110101"
+
+message = "HELLO"
+
+cipher = encrypt(message, seed)
+
+print("Original:", message)
+print("Ciphertext:", cipher)
+
+recovered = decrypt(cipher, seed)
+
+print("Decrypted:", recovered)
